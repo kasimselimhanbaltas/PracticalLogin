@@ -1,55 +1,105 @@
 import webbrowser
-from cv2 import find4QuadCornerSubpix
 import pyautogui as pa
 import time
 import os
 from tkinter import *
-import User
 from tkinter import messagebox
 import tkinter.font as font
 import Components
+import User
 
 chrome_path = 'C:/Program Files/Google/Chrome/Application/chrome.exe %s'
 
 comps = []
     
-def AddAcc():
-    def Ok():
-        uname = e3.get()
-        password = e4.get()
-        cpassword = e5.get()
-        print(uname)
-        print(password)
-        if (password == cpassword):
-            messagebox.showinfo("Account", "Account saved!")
-            with open("users.txt", "a+") as output_file:
-                output_file.write(f"{uname}\n{password}\n")
-            root4.destroy()
-        else:
-            messagebox.showinfo("Account","Passwords doesnt match!")
-            Ok()
-    root4=Tk()
-    root4.title("Add Account")
-    root4.geometry("400x250")
-    root4.resizable(0, 0)
-    global e3
-    global e4
-    global e5
-    Label(root4, text="Username",padx=20,pady=10).grid(row=0,column=0,columnspan=2)
-    Label(root4, text="Password",padx=20,pady=10).grid(row=1,column=0,columnspan=2)
-    Label(root4, text="Confirm Password",padx=20,pady=10).grid(row=2,column=0,columnspan=2)
-    e3 = Entry(root4,borderwidth=5)
-    e3.grid(row=0,column=4,columnspan=2,padx=20,pady=10)
-    e4=Entry(root4,borderwidth=5)
-    e4.grid(row=1,column=4,columnspan=2,padx=20,pady=10)
-    e4.config(show="*")
-    e5=Entry(root4,borderwidth=5)
-    e5.grid(row=2,column=4,columnspan=2,padx=20,pady=10)
-    e5.config(show="*")
-    registerbutton = Button(root4, text="Add Account",padx=30,pady=20,command=Ok)
-    registerbutton.grid(row=3,column=1,columnspan=4)
-    root4.mainloop()
+#Satir sayisini tespit etme
+def satirsayisi():
+    with open ("users.txt","r") as file:
+        count = 0
+        for line in file:
+            count+=1
+    return count
+#Girilen hesap dosyada kayıtlı iise 1 değilse 0 döndürür
+def HesapKontrol(accname):
+    file = open("users.txt","r")
+    r = file.readlines()
+    for i in range(satirsayisi()):
+        if r[i].strip()==accname:
+            return 1
+    else:
+        return 0
+#Hesap dosyada yoksa girilen parametreleri ekle
+def writeAcc(acc,uname,pw):
+    file =open ("users.txt","a")
+    file.write(f"{acc}\n{uname}\n{pw}\n")
+    file.close()
 
+#Hesap mevcut ise username ve passwordu al
+def GetAccData(acc):
+    file =open ("users.txt","r")
+    r = file.readlines()
+    mevcut = 0
+    for i in range(satirsayisi()):
+        if acc==r[i].strip():
+            uname1 = r[i+1].strip()
+            pw1 = r[i+2].strip()
+            mevcut+=1
+            return str(uname1),str(pw1)
+    if mevcut == 0:
+        return 0,0
+    file.close()
+    
+
+def AddAcc(acc):
+    def Ok():
+        def saveAcc():
+            uname = e3.get()
+            password = e4.get()
+            writeAcc(acc,uname,password)
+            messagebox.showinfo("Account","Account saved!")
+            root4.destroy()
+        root4=Tk()
+        root4.title("Add Account")
+        root4.geometry("400x250+800+85")
+        root4.resizable(0, 0)
+        global e3
+        global e4
+        global e5
+        Label(root4, text="Username",padx=20,pady=10).grid(row=0,column=0,columnspan=2)
+        Label(root4, text="Password",padx=20,pady=10).grid(row=1,column=0,columnspan=2)
+        e3 = Entry(root4,borderwidth=5)
+        e3.grid(row=0,column=4,columnspan=2,padx=20,pady=10)
+        e4=Entry(root4,borderwidth=5)
+        e4.grid(row=1,column=4,columnspan=2,padx=20,pady=10)
+        e4.config(show="*")
+        registerbutton = Button(root4, text="Save Account",padx=30,pady=20,command=saveAcc)
+        registerbutton.grid(row=3,column=1,columnspan=4)
+        root4.mainloop()
+        
+    if HesapKontrol(acc) != 1:#Saving accounts
+        Ok()
+    else:#Already registered
+        messagebox.showinfo("Account","You already registered for this component.")
+    
+def AddAcc1():
+    AddAcc("insta")
+def AddAcc2():
+    AddAcc("twtr")
+def AddAcc3():
+    AddAcc("yt")
+def AddAcc4():
+    AddAcc("gh")
+def AddAcc5():
+    AddAcc("stack")    
+def AddAcc6():
+    AddAcc("twtch")    
+def AddAcc7():
+    AddAcc("ues")    
+def AddAcc8():
+    AddAcc("bys") 
+def AddAcc9():
+    AddAcc("li")  
+         
 def Main():
     def EditList():
         def GetValues():
@@ -77,18 +127,15 @@ def Main():
                 comps.append('ggl')
             if i12.get()==1:
                 comps.append('wik')
-            """for comp in comps:
-                print(comp)"""
         def comOk():
             GetValues()
             root.destroy()
             placement()
 
-
         #root2.withdraw()
         root = Toplevel(root2)
         root.title('Edit The List')
-        root.geometry('300x800+800+100')
+        root.geometry('300x800+800+85')
 
         myFont = font.Font(size=15)
         i=IntVar()
@@ -116,15 +163,15 @@ def Main():
         i12=IntVar()
         c12 = Checkbutton(root, padx=10, text="Wikipedia", variable=i12)
 
-        accInsta = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accTwitter = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accYoutube = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accGithub = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accStack = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accTwitch = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accUes = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accBys = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
-        accLinkedIn = Button(root, text= "Account", padx=30,pady=4,command=AddAcc)
+        accInsta = Button(root, text= "Account", padx=30,pady=4,command=AddAcc1)
+        accTwitter = Button(root, text= "Account", padx=30,pady=4,command=AddAcc2)
+        accYoutube = Button(root, text= "Account", padx=30,pady=4,command=AddAcc3)
+        accGithub = Button(root, text= "Account", padx=30,pady=4,command=AddAcc4)
+        accStack = Button(root, text= "Account", padx=30,pady=4,command=AddAcc5)
+        accTwitch = Button(root, text= "Account", padx=30,pady=4,command=AddAcc6)
+        accUes = Button(root, text= "Account", padx=30,pady=4,command=AddAcc7)
+        accBys = Button(root, text= "Account", padx=30,pady=4,command=AddAcc8)
+        accLinkedIn = Button(root, text= "Account", padx=30,pady=4,command=AddAcc9)
 
         butOK = Button(root, text='Tamam', padx=5, pady=10, command=comOk)
 
@@ -171,7 +218,7 @@ def Main():
     
     root2=Tk()
     root2.title("PracticalLogin")
-    root2.geometry("450x800+800+100")
+    root2.geometry("450x800+800+85")
     root2.resizable(0, 0)
 
     # configure the grid
@@ -287,15 +334,5 @@ def Main():
     placement()
     root2.mainloop()
 
-try:
-    with open("users.txt","r") as output_file:
-        data = output_file.readlines()
-        print(data[1])
-        User.Acces.Login()
-        Main()
-except(IndexError):
-    print("error")
-    User.Acces.Register()
-    Main()
 
-    
+
